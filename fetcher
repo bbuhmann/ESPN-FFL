@@ -1,7 +1,11 @@
-### to get into ENV environemnt - source ENV/bin/activate
-from dataclasses import dataclass, field
+"""Main code body"""
 import requests, json
 import google.cloud.bigquery
+from  object_model import (
+    fflOwner,
+    fflPlayer,
+    fflTeam
+)
 swid = '{EEC210EE-DAC6-11D2-94E8-0060B067D8ED}'
 espn_s2 = 'AECzbf5PiFkW8NaM6ROQ3eDXVRzDbAXdCLeBxiF%2B6SniGFEEAwChH3EWQXG5vfzMo22bM2WA%2BCItF0FQBS5HJcMXZhPDIDUVZHTTW1cPqeE06cjTFA9ODzu%2F26c%2Bd597ks4Pp6N7fDdqAKHBdv4zefe1Fhw0q53NjlzwC9oXd1Y2nzntcIcuaULkUG68HuDGaHrjZNqrwghuftxdybqbDVNqa37%2BCe4FRtIy744l98r%2FJZun1yoS6jCzwY6CAUno97nIfEjJJ1pwKAEHQz87AQudAs7L%2B2JBR41RrUikW67heg%3D%3D'
 
@@ -9,51 +13,6 @@ POSITION_MAP = {0: 'QB', 1: 'QB', 2: 'RB', 3: 'WR', 4: 'TE', 5: 'K', 6: 'TE', 7:
 TEAM_NAMES = {1: 'Burlingame Bad Deals', 2: 'Fall City Hairy Backfield', 3: 'Bellevue LFGs', 4: 'Freeman Balls', 5: 'Half Chubb', 6: 'Stuck Up Hunts', 7: 'North Beach Mobsters', 8: 'Chicago Homers', 9: 'Crazy Rich Asian', 10: 'Oakland Hills Hacks'}
 TEAM_OWNERS = {1: 'Ben Shapiro', 2: 'Adam Grossman', 3: 'Jason LeeKeenan', 4: 'Brendan Buhmann', 5: 'Mike Blais', 6: 'Dave Karol', 7: 'Jordan Koene', 8: 'Nate Lyman', 9: 'Yi-Jau Ku', 10: 'Doug Bell'}
 
-@dataclass(slots=True)
-class fflOwner():
-    id:str
-    first_name:str
-    last_name:str
-    full_name:str = ""
-    
-    def __post_init__(self):
-        self.full_name = f"{self.first_name} {self.last_name}"
-    
-@dataclass(slots=True)   
-class fflPlayer():
-    name:str
-    id:str
-    message:str
-    player_position:str
-    lineup_position:str
-    last_week_score:int
-    current_week_score:int
-    
-
-@dataclass(slots=True)
-class fflTeam():
-    team_name:str
-    team_number:str
-    players:list(fflPlayer) = list()
-    owner:fflOwner = None
-    
-    def assign_owner(
-        self,
-        owner
-    ):
-        """Assigns an owner to the team
-
-        Args:
-            owner (_type_): Team Owner object
-        """
-        self.owner = owner
-        
-    def add_player(
-        self,
-        player:fflPlayer
-    ):
-        self.players.append(player)
-    
     
 def main():
     geourl = "http://fantasy.espn.com/apis/v3/games/ffl/seasons/2023/segments/0/leagues/612662"
@@ -61,15 +20,18 @@ def main():
     response = requests.get(geourl,
         cookies={'swid': swid,
                  'espn_s2': espn_s2},
-        params=[('view': 'mRoster'),('view','mTeams')]
+        params=[('view','mRoster'),('view','mTeams')]
         )
 
     data = json.loads(response.text)
     response_teams = data['teams']
     response_members = data['members']
-    ffl_teams = []
+    ffl_teams = {}
+    ffl_owners = {}
+    for member in response_members:
+        ffl_owners[member["id"]]=fflOwner(member["id"],member["firstName"],member["lastName"])
     for team in response_teams:
-        ffl_teams.append(fflOwner(team[""]))
+        ffl_teams[team["id"]] = fflTeam(team["name"],team["id"],owner=ffl_owners[team["primaryOwner"]])
 
     
 
