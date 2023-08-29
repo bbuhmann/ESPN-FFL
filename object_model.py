@@ -1,5 +1,5 @@
 '''Objects used during process'''
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 @dataclass(slots=True)
@@ -23,7 +23,7 @@ class fflPlayer():
     injured:bool
     acquisition_unix:int
     acquisition_type:str
-    acquistion_date:str = None
+    acquisition_date:str = None
     player_position:str = None
     lineup_position:str = None
     
@@ -31,8 +31,7 @@ class fflPlayer():
         POSITION_MAP = {0: 'QB', 1: 'QB', 2: 'RB', 3: 'WR', 4: 'TE', 5: 'K', 6: 'TE', 7: 'OP', 8: 'DT', 9: 'DE', 10: 'LB', 11: 'DL',12: 'CB', 13: 'S', 14: 'DB', 15: 'DP', 16: 'D/ST',  17: 'K', 18: 'P',  19: 'HC',  20: 'BE',  21: 'IR',  22: '',  23: 'RB/WR/TE',  24: 'ER',  25: 'Rookie', 'QB': 0, 'RB': 2, 'WR': 4, 'TE': 6, 'D/ST': 16, 'K': 17, 'FLEX': 23}
         self.player_position = POSITION_MAP[self.player_position_id]
         self.lineup_position = POSITION_MAP[self.lineup_position_id]
-        self.acquistion_date = datetime.utcfromtimestamp(self.acquisition_unix).strftime('%m-%d-%y')
-        
+        self.acquisition_date = datetime.utcfromtimestamp(self.acquisition_unix/1000).strftime('%m-%d-%y')
     
 
 @dataclass(slots=True)
@@ -42,7 +41,7 @@ class fflTeam():
     division_id:int
     owner:fflOwner
     division_name:str = None
-    players:list(fflPlayer) = list()
+    players:list() = field(default_factory=list)
     
     def __post_init__(self):
         self.division_name = "Greater Santa Clara Area" if self.division_id==1 else "Norther Lights"

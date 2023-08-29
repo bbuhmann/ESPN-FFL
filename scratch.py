@@ -1,24 +1,59 @@
-from dataclasses import dataclass
+"""Main code body"""
+import requests
+import json
+from datetime import datetime
+from copy import deepcopy
+import io
+import google.auth
+from  google.cloud import bigquery
+from  object_model import (
+    fflOwner,
+    fflPlayer,
+    fflTeam
+)
 
-@dataclass(slots=True)
-class fflTeam():
-    team_name:str
-    team_number:str
-    players:list()=None
-    owner:str=None
-    new_att:str=None
-    
-    def __post_init__(self):
-        self.players = list()
-        self.owner = None
-        
-    def set_new_att(self,new_att):
-        self.new_att = new_att
+projectId="tenderknob-dynasty-ffl-829734"
+dataset_id = "Tenderknob_Dynasty_FFL"
+table_id = "teams_list"
+credentials, project = google.auth.default(
+        scopes=[
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/bigquery",
+        ]
+    )
 
-variable = fflTeam('abces','dfsdf')
-variable.set_new_att('fdsfd')
+bq_client = bigquery.Client(
+        credentials=credentials, project=project
+    )
 
-print(variable.new_att)
+ffl_dataset = bq_client.dataset(dataset_id,projectId)
+table_partition_ref = bigquery.TableReference(ffl_dataset,f"{table_id}${datetime.today().strftime('%Y%m%d')}")
+table_ref = bigquery.TableReference(ffl_dataset,table_id)
+schema = list()
+fields = {
+    "Owner_Name":"STRING",
+    "Team_Name":"STRING",
+    "Division_Name":"STRING",
+    "Division_ID":"STRING",
+    "Team_Number":"STRING",
+    "Load_Date":"DATE",
+    "Player_Name":"STRING",
+    "Player_Message":"STRING",
+    "Player_Position":"STRING",
+    "Player_Lineup_Position":"STRING",
+    "Player_Salary":"INT64",
+    "Injured":"Boolean",
+    "Acquisition_Type":"STRING",
+    "Acquisition_Date":"STRING"
+}
+for field,datatype in fields.items():
+    schema.append(bigquery.SchemaField(field,datatype))
+
+table = bigquery.Table(table_ref,schema)
+
+
+bq_client.create_table(table)
+
 # import json
 # import requests
 
@@ -31,7 +66,12 @@ print(variable.new_att)
 
 # request_params = [
 #     'mRoster',
-#     'mTeam'
+#     'mTeam',
+#     'mSettings',
+#     'mPendingTransactions',
+#     'mMatchupScore',
+#     'mScoreboard',
+#     'mStatus'
 # ]
 
 # full_request = [("view",param) for param in request_params]
@@ -43,7 +83,7 @@ print(variable.new_att)
 #     params=full_request, timeout=60
 #     )
 
-# new_file = open('tmp/mTeamRoster.json','w',encoding='utf-8')
+# new_file = open('mConsolidated.json','w',encoding='utf-8')
 # new_file.write(json.dumps(json.loads(response.text), indent=2))
 # new_file.close()
 
