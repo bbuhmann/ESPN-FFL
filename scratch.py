@@ -1,16 +1,7 @@
 """Main code body"""
-import requests
-import json
 from datetime import datetime
-from copy import deepcopy
-import io
 import google.auth
 from  google.cloud import bigquery
-from  object_model import (
-    fflOwner,
-    fflPlayer,
-    fflTeam
-)
 
 projectId="tenderknob-dynasty-ffl-829734"
 dataset_id = "Tenderknob_Dynasty_FFL"
@@ -50,7 +41,6 @@ for field,datatype in fields.items():
     schema.append(bigquery.SchemaField(field,datatype))
 
 table = bigquery.Table(table_ref,schema)
-
 
 bq_client.create_table(table)
 
