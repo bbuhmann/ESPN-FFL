@@ -129,7 +129,7 @@ response = requests.get(
     api_url, cookies={"swid": swid, "espn_s2": espn_s2}, params=full_request, timeout=60
 )
 
-new_file = open("mConsolidated.json", "w", encoding="utf-8")
+new_file = open("tmp/mConsolidated.json", "w", encoding="utf-8")
 new_file.write(json.dumps(json.loads(response.text), indent=2))
 new_file.close()
 

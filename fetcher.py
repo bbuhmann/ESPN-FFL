@@ -20,13 +20,14 @@ def populate_objects() -> dict:
         dict: dict of ffl Team Objects
     """
     
-    # secret_val = get_secret("projects/575591763219/secrets/FFL_League_Credentials/versions/latest")
-    # swid=secret_val["SWID"]
-    # espn_s2 = secret_val["ESPN_S2"]
-    api_url = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2024/segments/0/leagues/612662?"
+    secret_val = get_secret("projects/575591763219/secrets/FFL_League_Credentials/versions/latest")
+    swid=secret_val["SWID"]
+    espn_s2 = secret_val["ESPN_S2"]
+    season="2024"
+    api_url = f"https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/612662"
     
-    espn_s2 = os.getenv("ESPN_S2")
-    swid = os.getenv("SWID")
+    # espn_s2 = os.getenv("ESPN_S2")
+    # swid = os.getenv("SWID")
     
     request_params = [
         'mRoster',
@@ -48,6 +49,8 @@ def populate_objects() -> dict:
     data = json.loads(response.text)
     response_teams = data['teams']
     response_members = data['members']
+    response_draft_details = data['draftDetail']
+    draft_status = response_draft_details['drafted']
     ffl_teams = {}
     ffl_owners = {}
     for member in response_members:
@@ -63,7 +66,7 @@ def populate_objects() -> dict:
                     player_details["seasonOutlook"] if "seasonOutlook" in player_details else "",
                     player_details["defaultPositionId"],
                     player["lineupSlotId"],
-                    max(player['playerPoolEntry']["keeperValueFuture"],1),
+                    max(player['playerPoolEntry']["keeperValue"] if not draft_status else player['playerPoolEntry']["keeperValueFuture"],1),
                     player_details["injured"],
                     player["acquisitionDate"],
                     player["acquisitionType"],
