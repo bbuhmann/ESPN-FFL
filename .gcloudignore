@@ -4,5 +4,5 @@ tmp/
 __pycache__
 scratch.py
 .DS_Store
-.python_versions
+.python_version
 scratch.py

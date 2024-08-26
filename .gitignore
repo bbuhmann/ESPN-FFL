@@ -3,4 +3,4 @@ tmp/
 .vscode
 __pycache__
 .DS_Store
-.python_versions
+.python_version
