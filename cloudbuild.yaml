@@ -1,0 +1,23 @@
+steps:
+  - name: 'docker.io/library/python:3.10-slim'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        pip install --upgrade pip
+        pip install poetry==1.4.2
+        poetry export --without-hashes --output requirements.txt
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - gcloud
+      - --quiet
+      - beta
+      - functions
+      - deploy
+      - FFL_Roster_Details_Fetch
+      - --region=us-central1
+      - --runtime=python310
+      - --entry-point=main
+      - --timeout=120s
+      - --memory=128MB
+      - --trigger-http

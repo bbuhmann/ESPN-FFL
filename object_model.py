@@ -23,14 +23,16 @@ class fflPlayer():
     injured:bool
     acquisition_unix:int
     acquisition_type:str
+    pro_team_id:int
     acquisition_date:str = None
     player_position:str = None
     lineup_position:str = None
     
     def __post_init__(self):
-        POSITION_MAP = {0: 'QB', 1: 'QB', 2: 'RB', 3: 'WR', 4: 'TE', 5: 'K', 6: 'TE', 7: 'OP', 8: 'DT', 9: 'DE', 10: 'LB', 11: 'DL',12: 'CB', 13: 'S', 14: 'DB', 15: 'DP', 16: 'D/ST',  17: 'K', 18: 'P',  19: 'HC',  20: 'BE',  21: 'IR',  22: '',  23: 'RB/WR/TE',  24: 'ER',  25: 'Rookie', 'QB': 0, 'RB': 2, 'WR': 4, 'TE': 6, 'D/ST': 16, 'K': 17, 'FLEX': 23}
-        self.player_position = POSITION_MAP[self.player_position_id]
-        self.lineup_position = POSITION_MAP[self.lineup_position_id]
+        POSITION_DICT = {0: 'QB', 1: 'QB', 2: 'RB', 3: 'WR', 4: 'TE', 5: 'K', 6: 'TE', 7: 'OP', 8: 'DT', 9: 'DE', 10: 'LB', 11: 'DL',12: 'CB', 13: 'S', 14: 'DB', 15: 'DP', 16: 'D/ST',  17: 'K', 18: 'P',  19: 'HC',  20: 'BE',  21: 'IR',  22: '',  23: 'RB/WR/TE',  24: 'ER',  25: 'Rookie', 'QB': 0, 'RB': 2, 'WR': 4, 'TE': 6, 'D/ST': 16, 'K': 17, 'FLEX': 23}
+        LINEUP_DICT = {0: 'QB', 1: 'QB', 2: 'RB', 3: 'RB/WR', 4: 'WR', 5: 'K', 6: 'TE', 7: 'OP', 8: 'DT', 9: 'DE', 10: 'LB', 11: 'DL',12: 'CB', 13: 'S', 14: 'DB', 15: 'DP', 16: 'D/ST',  17: 'K', 18: 'P',  19: 'HC',  20: 'BE',  21: 'IR',  22: '',  23: 'RB/WR/TE',  24: 'ER',  25: 'Rookie', 'QB': 0, 'RB': 2, 'WR': 4, 'TE': 6, 'D/ST': 16, 'K': 17, 'FLEX': 23}
+        self.player_position = POSITION_DICT[self.player_position_id]
+        self.lineup_position = LINEUP_DICT[self.lineup_position_id]
         self.acquisition_date = datetime.utcfromtimestamp(self.acquisition_unix/1000).strftime('%m-%d-%y')
     
 
@@ -44,7 +46,7 @@ class fflTeam():
     players:list() = field(default_factory=list)
     
     def __post_init__(self):
-        self.division_name = "Greater Santa Clara Area" if self.division_id==1 else "Norther Lights"
+        self.division_name = "Greater Santa Clara Area" if self.division_id==1 else "Northern Lights"
     
     def update_owner(
         self,

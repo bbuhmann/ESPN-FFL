@@ -3,3 +3,6 @@ tmp/
 .vscode
 __pycache__
 scratch.py
+.DS_Store
+.python_versions
+scratch.py
